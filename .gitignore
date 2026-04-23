@@ -1,0 +1,5 @@
+node_modules/
+wa_session/
+seen_leads.json
+daily.json
+*.log
