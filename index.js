@@ -81,10 +81,14 @@ function normKey(s) {
   return (s || '').toUpperCase().replace(/\s+/g, '').replace(/MCA$/, '').replace(/^MCA/, '');
 }
 
+function stripBrand(s) {
+  return (s || '').replace(/^(peugeot|citroen|citroën|opel)\s+/i, '').trim();
+}
+
 async function getPrecio(modelo) {
   const db = await cargarPrecios();
   if (!db || !modelo) return null;
-  const target = normKey(modelo);
+  const target = normKey(stripBrand(modelo));
   for (const brand of Object.values(db)) {
     for (const tipo of Object.values(brand)) {
       for (const [key, versions] of Object.entries(tipo)) {
