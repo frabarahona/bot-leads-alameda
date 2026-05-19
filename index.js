@@ -241,7 +241,7 @@ async function checkLeads() {
           await apiPost('/api/lead/seguimiento', {
             id: lead.id, idMotivo: 169, otroMotivo: '',
             asunto: 'Esperamos su Confirmación',
-            descripcion: 'Notificación enviada al ejecutivo para contacto vía WhatsApp',
+            descripcion: 'Cliente gestionado via whatsapp',
             idUsuario: 0, fecha: '', hora: 9, minuto: 0,
             numeroFacturaBoleta: 0, idMarca: 0, idPromocion: 0
           });
