@@ -158,15 +158,15 @@ function normPhone(tel) {
   if (d.length >= 9) return '56' + d;
   return null;
 }
-function buildMsg(nombre, modelo) {
+function buildMsg(nombre, modelo, precio) {
   const first = (nombre || 'cliente').split(' ')[0];
-  const mod = splitCamel(modelo || '').trim();
+  const mod   = splitCamel(modelo || '').trim();
   if (!mod) {
     return 'Hola ' + first + ', mi nombre es ' + NOMBRE + ' ejecutivo de Peugeot, Citroen y Opel de automotora Alameda. Hemos recibido una solicitud de cotizacion pero me gustaria saber que vehiculo buscas? asi te puedo entregar una mejor atencion.';
   }
-  return saludo() + ', ' + first + ', mi nombre es ' + NOMBRE + ', ejecutivo de ventas de Peugeot, Citroen y Opel de Automotora Alameda. Hemos recibido una solicitud de cotizacion por ' + mod + '. Te queria comentar que este mes tenemos grandes promociones. Quedo muy atento a como poder ayudarte a tener tu proximo 0km.';
+  const ps = precio ? 'parte desde los ' + fmtPrice(precio) : 'tiene un valor especial este mes';
+  return saludo() + ', ' + first + ', mi nombre es ' + NOMBRE + ', ejecutivo de ventas de Peugeot, Citroen y Opel de Automotora Alameda. Hemos recibido una solicitud de cotizacion por ' + mod + '. Te queria comentar que este mes tenemos grandes promociones y su valor ' + ps + '. Quedo muy atento a como poder ayudarte a tener tu proximo 0km.';
 }
-
 
 // ── Email ────────────────────────────────────────────────────
 async function enviarEmail(lead, phone, nombre, modelo, msg) {
@@ -229,9 +229,11 @@ async function checkLeads() {
         const phone  = normPhone(det.telefono || lead.telefono);
         const nombre = det.nombreCliente || lead.nombreCliente || 'Cliente';
         const modelo = det.nombreModelo  || lead.nombreModelo  || '';
-        const msg    = buildMsg(nombre, modelo,;
+        const precio = await getPrecio(modelo);
+        const msg    = buildMsg(nombre, modelo, precio);
         const diario = getDiario();
 
+        if (precio) log('💰 Precio ' + modelo + ': ' + fmtPrice(precio));
         else if (modelo) log('⚠️ Sin precio para: ' + modelo);
 
         if (diario < MAX_DIARIO) {
@@ -241,7 +243,7 @@ async function checkLeads() {
           await apiPost('/api/lead/seguimiento', {
             id: lead.id, idMotivo: 169, otroMotivo: '',
             asunto: 'Esperamos su Confirmación',
-            descripcion: 'Notificación enviada al ejecutivo para contacto vía WhatsApp',
+            descripcion: 'Cliente gestionado via whatsapp',
             idUsuario: 0, fecha: '', hora: 9, minuto: 0,
             numeroFacturaBoleta: 0, idMarca: 0, idPromocion: 0
           });
