@@ -229,7 +229,7 @@ async function checkLeads() {
         const phone  = normPhone(det.telefono || lead.telefono);
         const nombre = det.nombreCliente || lead.nombreCliente || 'Cliente';
         const modelo = det.nombreModelo  || lead.nombreModelo  || '';
-        const msg    = buildMsg(nombre, modelo);
+        const msg    = buildMsg(nombre, modelo,;
         const diario = getDiario();
 
         else if (modelo) log('⚠️ Sin precio para: ' + modelo);
@@ -241,7 +241,7 @@ async function checkLeads() {
           await apiPost('/api/lead/seguimiento', {
             id: lead.id, idMotivo: 169, otroMotivo: '',
             asunto: 'Esperamos su Confirmación',
-            descripcion: 'Cliente gestionado via whatsapp',
+            descripcion: 'Notificación enviada al ejecutivo para contacto vía WhatsApp',
             idUsuario: 0, fecha: '', hora: 9, minuto: 0,
             numeroFacturaBoleta: 0, idMarca: 0, idPromocion: 0
           });
