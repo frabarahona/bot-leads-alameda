@@ -248,6 +248,8 @@ async function checkLeads() {
             numeroFacturaBoleta: 0, idMarca: 0, idPromocion: 0
           });
           log('✅ Seguimiento #' + lead.id + ' registrado');
+          // Santander Drive (no afecta flujo anterior)
+          try { await (require('./santander')).registrarEnSantander(lead, log); } catch (eSant) { log('Santander: ' + eSant.message); }
         } else {
           log('⚠️ Límite diario ' + MAX_DIARIO + ' emails alcanzado');
         }
