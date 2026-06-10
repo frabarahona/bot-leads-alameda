@@ -1,19 +1,15 @@
 'use strict';
 // Santander Drive Automation - modulo separado, no afecta bot Alameda
-
 const puppeteer = require('puppeteer');
-
 const SB_URL  = 'https://santanderconsumer.custhelp.com';
 const SB_USER = process.env.SANT_USER || '';
 const SB_PASS = process.env.SANT_PASS || '';
-
 const PRECIOS = {
   '208': 14000000, '2008': 18000000, '3008': 25000000, '5008': 30000000,
-  'landtrek': 27000000, 'partner': 21000000, 'expert': 28000000, 'rifter': 20000000
+  '308': 20000000, 'rifter': 20000000, 'landtrek': 27000000, 'partner': 20000000,
+  'expert': 28000000, 'boxer': 30000000
 };
-
 let _browser = null;
-
 async function getBrowser() {
   if (_browser && _browser.isConnected()) return _browser;
   _browser = await puppeteer.launch({
@@ -22,18 +18,15 @@ async function getBrowser() {
   });
   return _browser;
 }
-
 function getModeloKey(m) {
   m = (m || '').toLowerCase();
   for (const k of Object.keys(PRECIOS)) { if (m.includes(k)) return k; }
   return null;
 }
-
 function getRut(lead) {
   return lead.rut || lead.rutCliente || lead.RutCliente || lead.rut_cliente ||
          lead.identificador || lead.cedula || '';
 }
-
 async function loginYNavegar(log) {
   const browser = await getBrowser();
   const page = await browser.newPage();
@@ -54,7 +47,6 @@ async function loginYNavegar(log) {
   }
   return page;
 }
-
 async function registrarEnSantander(lead, log) {
   if (!SB_USER || !SB_PASS) { log('Santander: credenciales no configuradas'); return; }
   const modeloBruto = (lead.modelo || '').toLowerCase();
@@ -114,5 +106,4 @@ async function registrarEnSantander(lead, log) {
     await page.close();
   }
 }
-
 module.exports = { registrarEnSantander };
