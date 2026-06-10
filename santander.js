@@ -50,12 +50,10 @@ async function loginYNavegar(log) {
 async function registrarEnSantander(lead, log) {
   if (!SB_USER || !SB_PASS) { log('Santander: credenciales no configuradas'); return; }
   const modeloBruto = (lead.nombreModelo || lead.modelo || '').toLowerCase();
-  const marcaBruta  = (lead.nombreMarca || lead.marca || '').toLowerCase();
-  if (marcaBruta && !marcaBruta.includes('peugeot')) { log('Santander: no es Peugeot, saltando'); return; }
   const rut = getRut(lead);
   if (!rut) { log('Santander: RUT no encontrado. Campos: ' + Object.keys(lead).join(', ')); return; }
-  const modeloKey = getModeloKey(modeloBruto);
-  if (!modeloKey) { log('Santander: modelo no mapeado: ' + (lead.nombreModelo || lead.modelo || '')); return; }
+  let modeloKey = getModeloKey(modeloBruto);
+  if (!modeloKey) { log('Santander: modelo no identificado (' + (lead.nombreModelo || lead.modelo || 'vacio') + '), usando 2008 por defecto'); modeloKey = '2008'; }
   const precio = PRECIOS[modeloKey];
   const pie = Math.round(precio / 2);
   const rutNum = rut.replace(/[.\-]/g, '');
