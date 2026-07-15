@@ -165,7 +165,7 @@ function buildMsg(nombre, modelo, precio) {
     return 'Hola ' + first + ', mi nombre es ' + NOMBRE + ' ejecutivo de Peugeot, Citroen y Opel de automotora Alameda. Hemos recibido una solicitud de cotizacion pero me gustaria saber que vehiculo buscas? asi te puedo entregar una mejor atencion.';
   }
   const ps = precio ? 'parte desde los ' + fmtPrice(precio) : 'tiene un valor especial este mes';
-  return saludo() + ', ' + first + ', mi nombre es ' + NOMBRE + ', ejecutivo de ventas de Peugeot, Citroen y Opel de Automotora Alameda. Hemos recibido una solicitud de cotizacion por ' + mod + '. Te queria comentar que este mes tenemos grandes promociones y su valor ' + ps + '. Quedo muy atento a como poder ayudarte a tener tu proximo 0km.';
+  return saludo() + ' ' + first + ', mi nombre es ' + NOMBRE + ', ejecutivo de ventas de Peugeot, Citroen y Opel de Automotora Alameda. Hemos recibido una solicitud de cotizacion por ' + mod + '. Te queria comentar que este mes tenemos grandes promociones. Quedo muy atento a como poder ayudarte a tener tu proximo 0km.';
 }
 
 // ── Email ────────────────────────────────────────────────────
