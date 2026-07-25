@@ -249,7 +249,7 @@ async function checkLeads() {
           });
           log('✅ Seguimiento #' + lead.id + ' registrado');
           // Santander Drive (no afecta flujo anterior)
-          try { await (require('./santander')).registrarEnSantander(lead, log); } catch (eSant) { log('Santander: ' + eSant.message); }
+          // try { await (require('./santander')).registrarEnSantander(lead, log); } catch (eSant) { log('Santander: ' + eSant.message); }
         } else {
           log('⚠️ Límite diario ' + MAX_DIARIO + ' emails alcanzado');
         }
