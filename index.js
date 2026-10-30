@@ -114,7 +114,13 @@ async function getToken() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nombreUsuario: ALAMEDA_USER, clave: ALAMEDA_PASS })
   });
-  const d = await r.json();
+  const txtLogin = await r.text();
+  let d = {};
+  try { d = JSON.parse(txtLogin); } catch {}
+  if (!d.token) {
+    // Diagnóstico: muestra cómo responde la plataforma (sin token ni clave)
+    log('🔎 Respuesta login: HTTP ' + r.status + ' | ' + txtLogin.replace(/"token"\s*:\s*"[^"]*"/gi, '"token":"***"').slice(0, 300));
+  }
   if (d.token) {
     _token = d.token;
     log('✅ Sesión Alameda iniciada');
@@ -129,8 +135,10 @@ async function getToken() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ desafio: d.desafio, codigo: codigo, usarCodigoRecuperacion: true })
       });
+      const txtMfa = await rv.text();
       let dv = {};
-      try { dv = await rv.json(); } catch {}
+      try { dv = JSON.parse(txtMfa); } catch {}
+      if (!dv.token) log('🔎 Respuesta verificación: HTTP ' + rv.status + ' | ' + txtMfa.slice(0, 300));
       if (dv.token) {
         _token = dv.token;
         log('✅ Sesión Alameda iniciada (verificación en dos pasos OK)');
