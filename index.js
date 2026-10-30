@@ -9,6 +9,8 @@ const { Resend } = require('resend');
 const BASE         = 'https://alameda-administracion.azurewebsites.net';
 const ALAMEDA_USER = process.env.ALAMEDA_USER    || '';
 const ALAMEDA_PASS = process.env.ALAMEDA_PASS    || '';
+// Códigos de recuperación para la verificación en dos pasos (uno o varios separados por coma)
+const MFA_CODES    = (process.env.ALAMEDA_MFA_CODES || '').split(',').map(function(c) { return c.trim().toUpperCase(); }).filter(Boolean);
 const NOMBRE       = process.env.NOMBRE_VENDEDOR || 'Franco Barahona';
 const MAX_DIARIO   = parseInt(process.env.MAX_DIARIO || '20');
 const RESEND_KEY   = process.env.RESEND_API_KEY  || '';
@@ -113,10 +115,32 @@ async function getToken() {
     body: JSON.stringify({ nombreUsuario: ALAMEDA_USER, clave: ALAMEDA_PASS })
   });
   const d = await r.json();
-  if (!d.token) throw new Error('Login Alameda fallido');
-  _token = d.token;
-  log('✅ Sesión Alameda iniciada');
-  return _token;
+  if (d.token) {
+    _token = d.token;
+    log('✅ Sesión Alameda iniciada');
+    return _token;
+  }
+  // Paso 2: verificación en dos pasos con código de recuperación
+  if ((d.estado === 'mfa_requerido' || d.estado === 'mfa_configuracion_requerida') && d.desafio) {
+    if (!MFA_CODES.length) throw new Error('Login Alameda pide verificación y falta ALAMEDA_MFA_CODES en Railway');
+    for (const codigo of MFA_CODES) {
+      const rv = await fetch(BASE + '/api/sesion/mfa/verificar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ desafio: d.desafio, codigo: codigo, usarCodigoRecuperacion: true })
+      });
+      let dv = {};
+      try { dv = await rv.json(); } catch {}
+      if (dv.token) {
+        _token = dv.token;
+        log('✅ Sesión Alameda iniciada (verificación en dos pasos OK)');
+        return _token;
+      }
+      log('⚠️ Código de verificación rechazado (…' + codigo.slice(-3) + '), probando el siguiente');
+    }
+    throw new Error('Login Alameda fallido: ningún código de verificación fue aceptado');
+  }
+  throw new Error('Login Alameda fallido');
 }
 async function apiPost(path, body) {
   const tok = await getToken();
